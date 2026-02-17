@@ -1,0 +1,15 @@
+.DS_Store
+.vscode/*
+.idea
+*.iws
+*.iml
+*.ipr
+.nbproject/private/
+.nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+env/
+logs/
+*.log
