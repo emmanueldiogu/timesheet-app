@@ -19,6 +19,6 @@ public interface TimeEntryRepository extends BaseRepository<TimeEntry, UUID> {
 
     @Query("SELECT COALESCE(SUM(t.totalHours), 0) FROM TimeEntry t " +
             "WHERE t.employee = :employee AND t.workDate BETWEEN :start AND :end " +
-            "AND t.status = com.qodesquare.domain.time.TimeEntry.Status.APPROVED")
+            "AND t.status = com.qodesquare.domain.time.Status.APPROVED")
     BigDecimal totalApprovedHours(Employee employee, LocalDate start, LocalDate end);
 }
