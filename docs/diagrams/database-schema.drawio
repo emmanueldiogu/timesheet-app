@@ -1,0 +1,54 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.4.0">
+  <diagram name="Timesheet ERD v1 - Keycloak" id="zFvWPc9tFs-wyU8cQeTt">
+    <mxGraphModel dx="1018" dy="1881" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;backgroundOutline=1;darkOpacity=0.05;shadow=0;" value="Keycloak&#xa;(Users/Roles)&#xa;(External)" vertex="1">
+          <mxGeometry height="60" width="140" x="105" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="employees&#xa;id PK&#xa;keycloak_user_id FK&#xa;email, name&#xa;role (ADMIN/EMPLOYEE)&#xa;base_salary" vertex="1">
+          <mxGeometry height="100" width="140" x="275" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="time_entries&#xa;id PK&#xa;employee_id FK&#xa;work_date&#xa;clock_in/out&#xa;total_hours" vertex="1">
+          <mxGeometry height="100" width="140" x="275" y="-90" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="leave_types&#xa;id PK&#xa;code (VACATION,SICK,PTO)" vertex="1">
+          <mxGeometry height="60" width="140" x="535" y="-40" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="leave_requests&#xa;id PK&#xa;employee_id FK&#xa;leave_type_id FK&#xa;start_date/end_date" vertex="1">
+          <mxGeometry height="100" width="140" x="535" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="payroll_periods&#xa;id PK&#xa;start_date/end_date&#xa;status" vertex="1">
+          <mxGeometry height="80" width="200" x="545" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8f4;strokeColor=#6c8ebf;" value="payslips&#xa;id PK&#xa;employee_id FK&#xa;payroll_period_id FK&#xa;gross/net_pay" vertex="1">
+          <mxGeometry height="100" width="140" x="275" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-8" edge="1" parent="1" source="Od2mvqNoHrOO59WkkYvT-1" style="endArrow=ERoneToMany;html=1;rounded=0;entryX=0;entryY=0.5;" target="Od2mvqNoHrOO59WkkYvT-2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-9" edge="1" parent="1" source="Od2mvqNoHrOO59WkkYvT-2" style="endArrow=ERoneToMany;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Od2mvqNoHrOO59WkkYvT-3" value="1:N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-10" edge="1" parent="1" source="Od2mvqNoHrOO59WkkYvT-2" style="endArrow=ERoneToMany;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="Od2mvqNoHrOO59WkkYvT-5" value="1:N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-11" edge="1" parent="1" source="Od2mvqNoHrOO59WkkYvT-4" style="endArrow=ERoneToMany;html=1;rounded=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitDx=0;exitDy=0;" target="Od2mvqNoHrOO59WkkYvT-5" value="1:N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-12" edge="1" parent="1" source="Od2mvqNoHrOO59WkkYvT-2" style="endArrow=ERoneToMany;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="Od2mvqNoHrOO59WkkYvT-7" value="1:N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-13" edge="1" parent="1" source="Od2mvqNoHrOO59WkkYvT-6" style="endArrow=ERoneToMany;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="Od2mvqNoHrOO59WkkYvT-7" value="1:N">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Od2mvqNoHrOO59WkkYvT-14" parent="1" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;" value="Legend:&#xa;🔵 Keycloak&#xa;🟣 Employees&#xa;🟢 Time&#xa;🟠 Leave&#xa;🔴 Payroll" vertex="1">
+          <mxGeometry height="100" width="120" x="40" y="280" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
