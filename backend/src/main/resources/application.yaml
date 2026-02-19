@@ -2,6 +2,13 @@ spring:
   application:
     name: timesheet-api
     
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/timesheet
+          jwk-set-uri: http://keycloak:8080/realms/timesheet/protocol/openid-connect/certs
+
   datasource:
     url: jdbc:postgresql://db:5432/timesheet_db
     username: root
@@ -17,3 +24,16 @@ spring:
 
 server:
   port: 8080
+
+logging:
+  level:
+    "[org.springframework.security]": DEBUG  # Show auth details
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
