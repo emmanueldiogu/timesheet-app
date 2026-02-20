@@ -1,0 +1,26 @@
+# Database configuration
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=timesheet_db
+DB_USERNAME=root
+DB_PASSWORD=root
+
+# Keycloak configuration
+KEYCLOAK_ISSUER_URI=http://keycloak:8080/auth/realms/timesheet
+KEYCLOAK_JWK_SET_URI=http://keycloak:8080/realms/timesheet/protocol/openid-connect/certs
+KEYCLOAK_ADMIN=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+KC_DB=postgres
+KC_DB_URL=jdbc:postgresql://db:5432/keycloak
+
+# Frontend configuration
+VITE_API_URL=http://localhost:8080/api/employee/profile
+VITE_KEYCLOAK_URL=http://localhost:9080
+VITE_KEYCLOAK_REALM=timesheet
+FRONTEND_HOST=0.0.0.0
+FRONTEND_PORT=5173
+
+# Postgres specific
+POSTGRES_MULTIPLE_DATABASES=keycloak,timesheet_db
+POSTGRES_USER=root
+POSTGRES_PASSWORD=root

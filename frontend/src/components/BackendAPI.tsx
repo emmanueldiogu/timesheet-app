@@ -32,9 +32,11 @@ function BackendAPI() {
             );
             if (!response.ok) {
                 if (response.status === 401) {
-                    throw new Error("Unauthorized: Your session may have expired.");
+                    setError("Unauthorized: Your session may have expired.");
+                } else {
+                    setError(`Server responded with HTTP ${response.status}`);
                 }
-                throw new Error(`Server responded with HTTP ${response.status}`);
+                return;
             }
             const result = await response.json();
             setData(result);
