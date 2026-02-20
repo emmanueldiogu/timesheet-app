@@ -1,6 +1,7 @@
 services:
   backend:
     build: ./backend
+    image: timesheet-app-backend:1.0.0
     command: ./mvnw spring-boot:run
     ports: ["8080:8080"]
     environment:
@@ -8,6 +9,9 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Use internal URI for certificate fetch (backend to keycloak)
+      # Issuer validation is disabled (or matches the token's 'iss' claim from localhost)
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/timesheet/protocol/openid-connect/certs
     depends_on: 
       db:
         condition: service_healthy
@@ -23,10 +27,11 @@ services:
     build: 
       context: ./frontend
       target: development  # Vite dev server!
+    image: timesheet-app-frontend:1.0.0
     ports: ["5173:5173"]
     environment:
-      VITE_API_URL: http://backend:8080 # Dev proxy
-      VITE_KEYCLOAK_URL: http://keycloak:8080  # Container name
+      VITE_API_URL: http://localhost:8080/api/employee/profile # Accessible from browser
+      VITE_KEYCLOAK_URL: http://localhost:9080  # Accessible from browser
       VITE_KEYCLOAK_REALM: timesheet
       HOST: 0.0.0.0
       PORT: 5173
@@ -57,7 +62,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.3
-    command: start-dev
+    command: start-dev --hostname=localhost --http-enabled=true --hostname-strict=false
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://db:5432/keycloak

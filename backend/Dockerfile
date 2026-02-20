@@ -1,21 +1,29 @@
-# Stage 1: Maven Build (Java 25 + Spring Boot 4.0.2)
-FROM maven:3.9.12-eclipse-temurin-25 AS builder
+# Stage 1: Download the dependencies
+FROM eclipse-temurin:25.0.2_10-jdk-alpine AS dependencies
+
+RUN apk add --no-cache maven
+
+WORKDIR /build
+
+COPY pom.xml .
+
+RUN mvn dependency:go-offline
+
+# Stage 2: Build the application
+FROM dependencies AS builder
+
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+# Stage 3: Run the application
+FROM eclipse-temurin:25.0.2_10-jre-alpine AS runtime
+
 WORKDIR /app
 
-# Copy your exact pom.xml + source
-COPY . .
-RUN echo "=== RUNTIME JAR===" && ls -la /app || echo "Runtime Files not Found"
-
-# Build your JAR
-RUN ./mvnw clean package -DskipTests
-
-# Stage 2: Runtime (Java 25 JRE)
-FROM eclipse-temurin:25-jre-alpine
-WORKDIR /app
-
-# Copy YOUR JAR (exact name from your pom.xml)
-COPY --from=builder /app/target/timesheet-api-0.0.1-SNAPSHOT.jar app.jar
-RUN echo "=== RUNTIME JAR===" && ls -la /app || echo "Runtime Files not Found"
+COPY --from=builder /build/target/*.jar app.jar
 
 EXPOSE 8080
+
+# How the application will be run when the container starts
 ENTRYPOINT ["java", "-jar", "app.jar"]
