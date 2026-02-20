@@ -1,6 +1,6 @@
 .DS_Store
 .vscode/*
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -11,5 +11,7 @@ nbdist/
 .nb-gradle/
 
 env/
+.env
 logs/
+.output.txt
 *.log

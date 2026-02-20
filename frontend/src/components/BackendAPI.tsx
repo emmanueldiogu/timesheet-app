@@ -7,12 +7,22 @@ function BackendAPI() {
     const [error, setError] = useState("");
 
     const callBackend = async () => {
+        if (!keycloak.authenticated) {
+            setError("User is not authenticated");
+            return;
+        }
+
         setLoading(true);
         setError("");
         try {
-            await keycloak.updateToken(30);
+            const refreshed = await keycloak.updateToken(30);
+            if (!refreshed && !keycloak.token) {
+                setError("Session expired. Please login again.");
+                return;
+            }
+
             const response = await fetch(
-                (import.meta as any).env.VITE_API_URL || "http://localhost:8080/api/employee/profile",
+                import.meta.env.VITE_API_URL || "http://localhost:8080/api/employee/profile",
                 {
                     headers: {
                         Authorization: `Bearer ${keycloak.token}`,
@@ -20,7 +30,12 @@ function BackendAPI() {
                     },
                 },
             );
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error("Unauthorized: Your session may have expired.");
+                }
+                throw new Error(`Server responded with HTTP ${response.status}`);
+            }
             const result = await response.json();
             setData(result);
         } catch (err) {

@@ -5,18 +5,20 @@ services:
     command: ./mvnw spring-boot:run
     ports: ["8080:8080"]
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/timesheet_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      # Use internal URI for certificate fetch (backend to keycloak)
-      # Issuer validation is disabled (or matches the token's 'iss' claim from localhost)
-      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/timesheet/protocol/openid-connect/certs
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI}
+      KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI}
     depends_on: 
       db:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+    networks:
+      - app-network
     volumes:
       - ./backend/src:/app/src  # Hot reload source
       - ./backend/pom.xml:/app/pom.xml
@@ -30,11 +32,11 @@ services:
     image: timesheet-app-frontend:1.0.0
     ports: ["5173:5173"]
     environment:
-      VITE_API_URL: http://localhost:8080/api/employee/profile # Accessible from browser
-      VITE_KEYCLOAK_URL: http://localhost:9080  # Accessible from browser
-      VITE_KEYCLOAK_REALM: timesheet
-      HOST: 0.0.0.0
-      PORT: 5173
+      VITE_API_URL: ${VITE_API_URL}
+      VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL}
+      VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM}
+      HOST: ${FRONTEND_HOST}
+      PORT: ${FRONTEND_PORT}
     volumes:
       - ./frontend:/app  # Hot reload React!
       - /app/node_modules  # Don't overwrite node_modules
@@ -43,19 +45,23 @@ services:
     depends_on:
       - backend
       - keycloak
+    networks:
+      - app-network
 
   db:
     image: postgres:18-alpine
     environment:
-      POSTGRES_MULTIPLE_DATABASES: keycloak,timesheet_db
-      POSTGRES_PASSWORD: root
-      POSTGRES_USER: root
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
     ports: ["5432:5432"]
+    networks:
+      - app-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/01-init.sh
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -64,16 +70,18 @@ services:
     image: quay.io/keycloak/keycloak:26.5.3
     command: start-dev --hostname=localhost --http-enabled=true --hostname-strict=false
     environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db:5432/keycloak
-      KC_DB_USERNAME: root
-      KC_DB_PASSWORD: root
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: ${KC_DB}
+      KC_DB_URL: ${KC_DB_URL}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     ports: ["9080:8080"]
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD-SHELL", "timeout 10 bash -c 'exec 3<>/dev/tcp/localhost/8080' || exit 1"]
       interval: 10s
@@ -83,3 +91,8 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
