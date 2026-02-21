@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import lombok.extern.slf4j.Slf4j;
-import com.qodesquare.domain.employee.Employee;
 import com.qodesquare.domain.employee.Role;
 import com.qodesquare.domain.employee.Status;
 import com.qodesquare.dto.employee.EmployeeResponseDto;
-import com.qodesquare.exceptions.employee.EmployeeNotFoundException;
 import com.qodesquare.services.employee.EmployeeService;
 import com.qodesquare.services.security.CurrentUserService;
 
@@ -27,12 +25,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/api/employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final CurrentUserService currentUserService;
 
-    @GetMapping("/api/employees")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Page<EmployeeResponseDto> getAllEmployees(
             @RequestParam(required = false) String search,
