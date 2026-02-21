@@ -22,7 +22,7 @@ function BackendAPI() {
             }
 
             const response = await fetch(
-                import.meta.env.VITE_API_URL || "http://localhost:8080/api/employee/profile",
+                import.meta.env.VITE_API_URL || "http://localhost:8080/api/employees/me",
                 {
                     headers: {
                         Authorization: `Bearer ${keycloak.token}`,

@@ -25,8 +25,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "employees", indexes = {
-        @Index(name = "idx_employees_keycloak_user_id", columnList = "keycloakUserId"),
-        @Index(name = "idx_employees_email", columnList = "email")
+        @Index(name = "idx_employees_keycloak_user_id", columnList = "keycloakUserId")
 })
 public class Employee {
 
@@ -38,15 +37,6 @@ public class Employee {
     @Column(name = "keycloak_user_id", nullable = false, unique = true, length = 255)
     private String keycloakUserId;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
-    private String email;
-
-    @Column(name = "first_name", nullable = false, length = 100)
-    private String firstName;
-
-    @Column(name = "last_name", nullable = false, length = 100)
-    private String lastName;
-
     @Column(name = "hire_date")
     private java.time.LocalDate hireDate;
 
@@ -57,10 +47,6 @@ public class Employee {
     private BigDecimal hourlyRate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    private Role role;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private Status status;
 
@@ -69,6 +55,15 @@ public class Employee {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @jakarta.persistence.PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = Status.ACTIVE;
+        }
+    }
 
     @PreUpdate
     public void onUpdate() {

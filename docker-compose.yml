@@ -10,8 +10,12 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI}
       KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     depends_on: 
       db:
         condition: service_healthy
@@ -24,6 +28,7 @@ services:
       - ./backend/pom.xml:/app/pom.xml
       - ./backend/mvnw:/app/mvnw
       - ./backend/.mvn:/app/.mvn
+      - backend_target:/app/target
 
   frontend:
     build: 
@@ -91,6 +96,7 @@ services:
 
 volumes:
   postgres_data:
+  backend_target:
 
 networks:
   app-network:

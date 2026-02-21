@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.qodesquare.domain.employee.Employee;
 import com.qodesquare.domain.employee.Role;
+import com.qodesquare.domain.employee.Status;
 import com.qodesquare.repositories.BaseRepository;
 
 @Repository
@@ -16,13 +17,10 @@ public interface EmployeeRepository extends BaseRepository<Employee, UUID> {
 
     Optional<Employee> findByKeycloakUserId(String keycloakUserId);
 
-    Optional<Employee> findByEmail(String email);
-
     @Query("SELECT e FROM Employee e WHERE " +
-            "LOWER(e.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(e.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(e.lastName) LIKE LOWER(CONCAT('%', :search, '%'))")
-    List<Employee> search(String search);
+            "(:status IS NULL OR e.status = :status)")
+    org.springframework.data.domain.Page<Employee> search(@org.springframework.data.repository.query.Param("status") Status status, 
+                                                       org.springframework.data.domain.Pageable pageable);
 
-    List<Employee> findAllByRole(Role role);
+    List<Employee> findAllByStatus(Status status);
 }

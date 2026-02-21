@@ -45,7 +45,9 @@ public class SecurityConfig {
                 
                 // Role‑based protection
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/employee/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                .requestMatchers("/api/employees", "/api/employees/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                
+                .requestMatchers("/error").permitAll()
                 
                 // All other APIs require auth
                 .anyRequest().authenticated()
@@ -72,10 +74,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

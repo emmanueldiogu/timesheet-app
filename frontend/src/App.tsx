@@ -6,27 +6,60 @@ function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
+  const [initError, setInitError] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    keycloak
-      .init({
-        onLoad: "check-sso",
-        pkceMethod: "S256",
-      })
-      .then((auth) => {
-        console.log("Keycloak initialized:", auth);
+    let ignore = false;
+    let isInitializing = false;
+
+    const initKeycloak = async () => {
+      // Prevent double initialization only within the same effect cycle
+      if (isInitializing) {
+         return;
+      }
+
+      isInitializing = true;
+
+      try {
+        const auth = await keycloak.init({
+          onLoad: "check-sso",
+          pkceMethod: "S256",
+        });
+
+        if (ignore) return;
+
+        setInitialized(true);
         setAuthenticated(auth);
         if (auth && keycloak.tokenParsed) {
-          console.log("Token parsed:", keycloak.tokenParsed);
-          setUsername(keycloak.tokenParsed.preferred_username);
+          setUsername(keycloak.tokenParsed.preferred_username || "");
         }
-      })
-      .catch((error) => {
-        console.error("Keycloak initialization failed:", error);
-      })
-      .finally(() => {
-        setLoading(false); // Ensure loading is set to false even if there's an error
-      });
+      } catch (error) {
+        if (ignore) return;
+
+        // If it's the double initialization error from StrictMode, treat as already initialized
+        if (error instanceof Error && error.message.includes("initialized once")) {
+          setInitialized(true);
+          setAuthenticated(keycloak.authenticated || false);
+          if (keycloak.authenticated && keycloak.tokenParsed) {
+            setUsername(keycloak.tokenParsed.preferred_username || "");
+          }
+        } else {
+          setInitError(error instanceof Error ? error.message : "Unknown error");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+        isInitializing = false;
+      }
+    };
+
+    initKeycloak();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   if (loading)
@@ -35,6 +68,25 @@ function App() {
         Loading...
       </div>
     );
+
+  if (initError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 p-8">
+        <div className="text-2xl font-bold text-red-600 mb-4">
+          Keycloak Initialization Failed
+        </div>
+        <div className="text-red-800 mb-4 max-w-2xl text-center">
+          {initError}
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   if (!authenticated) {
     return (
@@ -62,7 +114,7 @@ function App() {
             <span className="font-semibold text-blue-600">{username}</span>!
           </p>
           <button
-            onClick={() => keycloak.logout()}
+            onClick={() => keycloak?.logout()}
             className="mt-4 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md font-medium"
           >
             Logout
