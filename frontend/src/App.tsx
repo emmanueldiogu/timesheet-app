@@ -7,7 +7,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [initError, setInitError] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -29,7 +28,6 @@ function App() {
 
         if (ignore) return;
 
-        setInitialized(true);
         setAuthenticated(auth);
         if (auth && keycloak.tokenParsed) {
           setUsername(keycloak.tokenParsed.preferred_username || "");
@@ -39,7 +37,6 @@ function App() {
 
         // If it's the double initialization error from StrictMode, treat as already initialized
         if (error instanceof Error && error.message.includes("initialized once")) {
-          setInitialized(true);
           setAuthenticated(keycloak.authenticated || false);
           if (keycloak.authenticated && keycloak.tokenParsed) {
             setUsername(keycloak.tokenParsed.preferred_username || "");
@@ -114,7 +111,7 @@ function App() {
             <span className="font-semibold text-blue-600">{username}</span>!
           </p>
           <button
-            onClick={() => keycloak?.logout()}
+            onClick={() => keycloak.logout()}
             className="mt-4 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md font-medium"
           >
             Logout

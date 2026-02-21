@@ -6,7 +6,7 @@ interface KeycloakConfig {
   clientId: string;
 }
 
-// Store instance in a variable that persists across HMR
+// Store an instance in a variable that persists across HMR
 let keycloakInstance: Keycloak | undefined;
 
 // Check if we need a fresh instance (page reload vs HMR)
@@ -15,15 +15,13 @@ const needsFreshInstance = () => {
   if (!keycloakInstance) return true;
 
   // If instance exists but not initialized, reuse it
-  // @ts-ignore - checking private property
-  if (!keycloakInstance.adapter) return false;
+  // Check if the instance is initialized by looking at public properties
+  if (!keycloakInstance.authenticated && !keycloakInstance.token) return false;
 
   // If we have a code in URL, this is a redirect callback - need fresh instance
-  if (window.location.search.includes('code=') || window.location.hash.includes('code=')) {
-    return true;
-  }
+  return window.location.search.includes('code=') || window.location.hash.includes('code=');
 
-  return false;
+
 };
 
 if (needsFreshInstance()) {
@@ -34,4 +32,8 @@ if (needsFreshInstance()) {
   } as KeycloakConfig);
 }
 
-export default keycloakInstance!;
+if (!keycloakInstance) {
+  throw new Error('Keycloak instance initialization failed');
+}
+
+export default keycloakInstance as Keycloak;
