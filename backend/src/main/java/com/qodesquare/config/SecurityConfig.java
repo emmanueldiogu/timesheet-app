@@ -42,13 +42,17 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                
+
+                // Swagger/OpenAPI endpoints
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/v3/api-docs").permitAll()
+
                 // Role‑based protection
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/employees", "/api/employees/**").hasAnyRole("ADMIN", "EMPLOYEE")
-                
+
                 .requestMatchers("/error").permitAll()
-                
+
                 // All other APIs require auth
                 .anyRequest().authenticated()
             )
